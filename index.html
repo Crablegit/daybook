@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daybook — Calendar & Tasks</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%234C6EF5%22/><text x=%2250%22 y=%2268%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22>D</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ============ AUTH SCREEN ============ -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="brand-mark">D</div>
+      <h1 data-i18n="appName">Daybook</h1>
+      <p class="muted" data-i18n="tagline">Your calendar, your ideas, your pace.</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-auth-tab="login" data-i18n="login">Log in</button>
+      <button class="auth-tab" data-auth-tab="register" data-i18n="register">Sign up</button>
+    </div>
+
+    <form id="login-form" class="auth-form">
+      <label data-i18n="email">Email</label>
+      <input type="email" id="login-email" required autocomplete="email" />
+      <label data-i18n="password">Password</label>
+      <input type="password" id="login-password" required autocomplete="current-password" />
+      <p class="auth-error" id="login-error"></p>
+      <button type="submit" class="btn btn-primary btn-block" data-i18n="login">Log in</button>
+    </form>
+
+    <form id="register-form" class="auth-form hidden">
+      <label data-i18n="email">Email</label>
+      <input type="email" id="register-email" required autocomplete="email" />
+      <label data-i18n="password">Password</label>
+      <input type="password" id="register-password" required autocomplete="new-password" minlength="6" />
+      <label data-i18n="confirmPassword">Confirm password</label>
+      <input type="password" id="register-confirm" required autocomplete="new-password" minlength="6" />
+      <p class="auth-error" id="register-error"></p>
+      <p class="auth-note" id="register-note"></p>
+      <button type="submit" class="btn btn-primary btn-block" data-i18n="register">Sign up</button>
+    </form>
+
+    <div class="auth-lang-switch">
+      <button class="lang-pill" data-lang="vi">VI</button>
+      <button class="lang-pill" data-lang="en">EN</button>
+      <button class="lang-pill" data-lang="zh">中文</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app-shell" class="app-shell hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="brand-mini">
+        <span class="brand-mark small">D</span>
+        <span class="brand-name" data-i18n="appName">Daybook</span>
+      </div>
+      <button id="btn-add-task" class="btn btn-accent btn-block" data-i18n="addTask">+ Add task</button>
+      <button id="btn-ai-import" class="btn btn-ghost btn-block" data-i18n="aiImport">✨ Add with AI</button>
+    </div>
+
+    <div class="mini-cal" id="mini-cal">
+      <div class="mini-cal-head">
+        <button id="mini-prev" aria-label="prev">‹</button>
+        <span id="mini-cal-label"></span>
+        <button id="mini-next" aria-label="next">›</button>
+      </div>
+      <div class="mini-cal-grid" id="mini-cal-grid"></div>
+    </div>
+
+    <div class="tag-filters">
+      <h4 data-i18n="tag">Tags</h4>
+      <label class="tag-check"><input type="checkbox" class="tag-filter-cb" value="study" checked><span class="dot dot-study"></span><span data-i18n="tagStudy">Study</span></label>
+      <label class="tag-check"><input type="checkbox" class="tag-filter-cb" value="work" checked><span class="dot dot-work"></span><span data-i18n="tagWork">Work</span></label>
+      <label class="tag-check"><input type="checkbox" class="tag-filter-cb" value="personal" checked><span class="dot dot-personal"></span><span data-i18n="tagPersonal">Personal</span></label>
+      <label class="tag-check"><input type="checkbox" class="tag-filter-cb" value="entertainment" checked><span class="dot dot-entertainment"></span><span data-i18n="tagEntertainment">Entertainment</span></label>
+    </div>
+
+    <div class="sidebar-bottom">
+      <button id="btn-settings" class="btn btn-ghost btn-block">⚙️ <span data-i18n="settings">Settings</span></button>
+      <div class="user-chip">
+        <span id="user-email" class="muted small"></span>
+        <button id="btn-logout" class="link-btn" data-i18n="logout">Log out</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button id="btn-today" class="btn btn-ghost" data-i18n="today">Today</button>
+        <div class="nav-arrows">
+          <button id="btn-prev" aria-label="prev">‹</button>
+          <button id="btn-next" aria-label="next">›</button>
+        </div>
+        <h2 id="period-label"></h2>
+      </div>
+      <div class="topbar-right">
+        <div class="view-switch" role="tablist">
+          <button class="view-btn" data-view="day" data-i18n="day">Day</button>
+          <button class="view-btn active" data-view="week" data-i18n="week">Week</button>
+          <button class="view-btn" data-view="month" data-i18n="month">Month</button>
+        </div>
+        <button id="btn-theme" class="icon-btn" aria-label="toggle theme">🌙</button>
+      </div>
+    </header>
+
+    <div id="overdue-banner" class="overdue-banner hidden"></div>
+
+    <section id="calendar-root" class="calendar-root"></section>
+  </main>
+</div>
+
+<!-- ============ MODAL: TASK ============ -->
+<div id="modal-task" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="task-modal-title" data-i18n="newTask">New task</h3>
+      <button class="icon-btn modal-close" data-close="modal-task">×</button>
+    </div>
+    <form id="task-form" class="modal-body">
+      <input type="hidden" id="task-id" />
+      <label data-i18n="title">Title</label>
+      <input type="text" id="task-title" required />
+
+      <div class="row-2">
+        <div>
+          <label data-i18n="date">Date</label>
+          <input type="date" id="task-date" required />
+        </div>
+        <div>
+          <label data-i18n="time">Time</label>
+          <input type="time" id="task-time" />
+        </div>
+      </div>
+
+      <label data-i18n="tag">Tag</label>
+      <select id="task-tag">
+        <option value="study" data-i18n="tagStudy">Study</option>
+        <option value="work" data-i18n="tagWork">Work</option>
+        <option value="personal" data-i18n="tagPersonal">Personal</option>
+        <option value="entertainment" data-i18n="tagEntertainment">Entertainment</option>
+      </select>
+
+      <label data-i18n="description">Notes</label>
+      <textarea id="task-description" rows="3"></textarea>
+
+      <label class="tag-check">
+        <input type="checkbox" id="task-completed" />
+        <span data-i18n="markComplete">Mark as done</span>
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" id="task-delete-btn" class="btn btn-danger-ghost hidden" data-i18n="delete">Delete</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-ghost" data-close="modal-task" data-i18n="cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" data-i18n="save">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: SETTINGS ============ -->
+<div id="modal-settings" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 data-i18n="settings">Settings</h3>
+      <button class="icon-btn modal-close" data-close="modal-settings">×</button>
+    </div>
+    <div class="modal-body">
+      <label data-i18n="language">Language</label>
+      <select id="settings-lang">
+        <option value="vi">Tiếng Việt</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+      </select>
+
+      <label data-i18n="appearance">Appearance</label>
+      <div class="segmented">
+        <button type="button" class="seg-btn" data-theme-choice="light" data-i18n="light">Light</button>
+        <button type="button" class="seg-btn" data-theme-choice="dark" data-i18n="dark">Dark</button>
+      </div>
+
+      <hr class="divider" />
+      <h4 data-i18n="aiSection">AI assistant (Google Gemini)</h4>
+      <p class="muted small" data-i18n="apiKeyHint">Stored only in your account…</p>
+      <label data-i18n="apiKey">Your Gemini API key</label>
+      <input type="password" id="settings-api-key" placeholder="AIza..." autocomplete="off" />
+      <label data-i18n="modelName">Model</label>
+      <input type="text" id="settings-model" placeholder="gemini-2.5-flash" />
+
+      <p class="settings-saved-msg hidden" id="settings-saved-msg" data-i18n="settingsSaved"></p>
+
+      <div class="modal-actions">
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-ghost" data-close="modal-settings" data-i18n="cancel">Cancel</button>
+        <button type="button" id="btn-save-settings" class="btn btn-primary" data-i18n="saveSettings">Save settings</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: AI IMPORT ============ -->
+<div id="modal-ai" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 data-i18n="aiImport">Add with AI</h3>
+      <button class="icon-btn modal-close" data-close="modal-ai">×</button>
+    </div>
+    <div class="modal-body">
+      <p class="muted small" data-i18n="aiImportHint">Paste text or upload a photo…</p>
+
+      <div class="segmented">
+        <button type="button" class="seg-btn active" data-ai-mode="text" data-i18n="aiImportText">Text</button>
+        <button type="button" class="seg-btn" data-ai-mode="image" data-i18n="aiImportImage">Image</button>
+      </div>
+
+      <div id="ai-text-pane">
+        <textarea id="ai-text-input" rows="4" data-i18n-placeholder="aiImportPlaceholder"></textarea>
+      </div>
+      <div id="ai-image-pane" class="hidden">
+        <input type="file" id="ai-image-input" accept="image/*" />
+        <img id="ai-image-preview" class="ai-image-preview hidden" />
+      </div>
+
+      <p class="auth-error" id="ai-error"></p>
+
+      <div class="modal-actions">
+        <div class="spacer"></div>
+        <button type="button" id="btn-ai-run" class="btn btn-primary" data-i18n="aiImportRun">Analyze</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: POSTPONE SUGGESTION ============ -->
+<div id="modal-postpone" class="modal-overlay hidden">
+  <div class="modal modal-small">
+    <div class="modal-head">
+      <h3 data-i18n="overdueTitle">This task is overdue</h3>
+      <button class="icon-btn modal-close" data-close="modal-postpone">×</button>
+    </div>
+    <div class="modal-body">
+      <p id="postpone-task-title" class="postpone-task-title"></p>
+      <p class="muted" data-i18n="overdueBody">Would you like to reschedule it?</p>
+      <div class="row-2">
+        <div>
+          <label data-i18n="newDate">New date</label>
+          <input type="date" id="postpone-date" />
+        </div>
+        <div>
+          <label data-i18n="newTime">New time</label>
+          <input type="time" id="postpone-time" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="btn-postpone-dismiss" class="btn btn-ghost" data-i18n="dismiss">Leave as is</button>
+        <div class="spacer"></div>
+        <button type="button" id="btn-postpone-confirm" class="btn btn-primary" data-i18n="confirmPostpone">Reschedule</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="js/config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/supabaseClient.js" defer></script>
+<script src="js/auth.js" defer></script>
+<script src="js/ai.js" defer></script>
+<script src="js/app.js" defer></script>
+</body>
+</html>
