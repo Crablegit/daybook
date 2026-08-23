@@ -12,7 +12,7 @@
 // ============================================================
 
 window.APP_CONFIG = {
-  SUPABASE_URL: "https://uwejhtolpuqxrxubaimx.supabase.co/rest/v1/",
+  SUPABASE_URL: "https://uwejhtolpuqxrxubaimx.supabase.co",
   SUPABASE_ANON_KEY: "sb_publishable_W4HF3N9eK8E0Cyk0qWb78g_y8VGLQLK",
 
   // Model Gemini mặc định dùng cho tính năng AI nhận diện công việc.
