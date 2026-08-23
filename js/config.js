@@ -12,8 +12,8 @@
 // ============================================================
 
 window.APP_CONFIG = {
-  SUPABASE_URL: "https://YOUR-PROJECT-REF.supabase.co",
-  SUPABASE_ANON_KEY: "YOUR-PUBLISHABLE-ANON-KEY",
+  SUPABASE_URL: "https://uwejhtolpuqxrxubaimx.supabase.co/rest/v1/",
+  SUPABASE_ANON_KEY: "sb_publishable_W4HF3N9eK8E0Cyk0qWb78g_y8VGLQLK",
 
   // Model Gemini mặc định dùng cho tính năng AI nhận diện công việc.
   // Người dùng có thể đổi trong phần Cài đặt (Settings) của app.
